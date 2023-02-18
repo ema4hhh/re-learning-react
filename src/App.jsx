@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
+import { Button } from '@mui/material';
 import styled from '@emotion/styled';
 
 import './App.css';
@@ -10,9 +11,10 @@ const PokemonRow = ({ pokemon, onSelect }) => {
       <td>{pokemon.name.english}</td>
       <td>{pokemon.type.join(', ')}</td>
       <td>
-        <button
+        <Button
+          variant="contained"
           onClick={() => onSelect(pokemon)}
-        >Select!</button>
+        >Select!</Button>
       </td>
     </tr>
   );
