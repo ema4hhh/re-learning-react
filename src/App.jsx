@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useReducer } from 'react';
 import styled from '@emotion/styled';
 
 import './App.css';
@@ -6,8 +6,30 @@ import './App.css';
 import PokemonInfo from './components/PokemonInfo';
 import PokemonFilter from './components/PokemonFilter';
 import PokemonTable from './components/PokemonTable';
+
 import PokemonContext from './PokemonContext';
 
+const pokemonReducer = (state, action) => {
+  switch (action.type) {
+    case 'SET_FILTER':
+      return {
+        ...state,
+        filter: action.payload,
+      }
+    case 'SET_POKEMON':
+      return {
+        ...state,
+        pokemon: action.payload,
+      }
+    case 'SET_SELECTED_POKEMON':
+      return {
+        ...state,
+        selectedPokemon: action.payload,
+      }
+    default:
+      throw new Error(`Unknown action ${action.type}`);
+  }
+}
 
 const Title = styled.h1`
   text-align: center;
@@ -26,25 +48,30 @@ const Container = styled.div`
 
 
 function App() {
-  const [filter, setFilter] = useState('');
-  const [selectedItem, setSelectedItem] = useState(null);
-  const [pokemon, setPokemon] = useState([]);
-  
+  const [state, dispatch] = useReducer(pokemonReducer, {
+    pokemon: [],
+    filter: "",
+    selectedPokemon: null,
+  })
+
   useEffect(() => {
     fetch('http://127.0.0.1:5173/pokemon.json')
-    .then(response => response.json())
-      .then(data => setPokemon(data));
-  }, [])
+      .then(response => response.json())
+      .then(data => dispatch({
+        type: 'SET_POKEMON',
+        payload: data
+      }));
+  }, []);
+
+  if (!state.pokemon) {
+    return <div>Loading data</div>;
+  }
 
   return (
     <PokemonContext.Provider
       value={{
-        filter,
-        setFilter,
-        pokemon,
-        setPokemon,
-        selectedItem,
-        setSelectedItem,
+        state,
+        dispatch
       }}
     >
       <Container>
@@ -69,7 +96,7 @@ export default App;
     this.state = {
       filter: "",
       pokemon: [],
-      selectedItem: null,
+      selectedPokemon: null,
     }
   }
 
