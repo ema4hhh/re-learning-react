@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer } from 'react';
+import React, { useEffect } from 'react';
 import styled from '@emotion/styled';
 
 import './App.css';
@@ -7,29 +7,8 @@ import PokemonInfo from './components/PokemonInfo';
 import PokemonFilter from './components/PokemonFilter';
 import PokemonTable from './components/PokemonTable';
 
-import PokemonContext from './PokemonContext';
-
-const pokemonReducer = (state, action) => {
-  switch (action.type) {
-    case 'SET_FILTER':
-      return {
-        ...state,
-        filter: action.payload,
-      }
-    case 'SET_POKEMON':
-      return {
-        ...state,
-        pokemon: action.payload,
-      }
-    case 'SET_SELECTED_POKEMON':
-      return {
-        ...state,
-        selectedPokemon: action.payload,
-      }
-    default:
-      throw new Error(`Unknown action ${action.type}`);
-  }
-}
+import { useDispatch, useSelector } from 'react-redux';
+import { setPokemon } from './pokemonSlice'
 
 const Title = styled.h1`
   text-align: center;
@@ -48,43 +27,30 @@ const Container = styled.div`
 
 
 function App() {
-  const [state, dispatch] = useReducer(pokemonReducer, {
-    pokemon: [],
-    filter: "",
-    selectedPokemon: null,
-  })
-
+  const pokemonData = useSelector(state => state.pokemon.pokemonData)
+  const dispatch = useDispatch();
+  
   useEffect(() => {
     fetch('http://127.0.0.1:5173/pokemon.json')
       .then(response => response.json())
-      .then(data => dispatch({
-        type: 'SET_POKEMON',
-        payload: data
-      }));
+      .then(data => dispatch(setPokemon(data)));
   }, []);
 
-  if (!state.pokemon) {
+  if (!pokemonData) {
     return <div>Loading data</div>;
   }
 
   return (
-    <PokemonContext.Provider
-      value={{
-        state,
-        dispatch
-      }}
-    >
-      <Container>
-        <Title>Pokemon Search</Title>
-        <TwoColumnLayout>
-          <div>
-            <PokemonFilter />
-            <PokemonTable />
-          </div>
-          <PokemonInfo />
-        </TwoColumnLayout>
-      </Container>
-    </PokemonContext.Provider>
+    <Container>
+      <Title>Pokemon Search</Title>
+      <TwoColumnLayout>
+        <div>
+          <PokemonFilter />
+          <PokemonTable />
+        </div>
+        <PokemonInfo />
+      </TwoColumnLayout>
+    </Container>
   );
 }
 
