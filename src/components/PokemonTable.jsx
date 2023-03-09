@@ -1,19 +1,17 @@
-import React, { useContext } from "react";
+import React from "react";
+import useStore from "../store";
 
 import PokemonRow from "./PokemonRow";
 
-import { useSelector, useDispatch } from 'react-redux';
-import { setSelectedPokemon } from "../pokemonSlice";
-
 function PokemonTable() {
-  const pokemonData = useSelector(state => state.pokemon.pokemonData);
-  const filter = useSelector(state => state.pokemon.filter);
-  const dispatch = useDispatch();
+  const pokemon = useStore(state => state.pokemon);
+  const filter = useStore(state => state.filter);
+  const setSelectedPokemon = useStore(state => state.setSelectedPokemon);
 
   return (
     <table width="100%">
       <tbody>
-        {pokemonData
+        {pokemon
           .filter(({ name: { english } }) =>
             english.toLowerCase().includes(filter.toLowerCase())
           )
@@ -22,7 +20,7 @@ function PokemonTable() {
             <PokemonRow
               pokemon={pokemon}
               key={pokemon.id}
-              onSelect={() => dispatch(setSelectedPokemon(pokemon))
+              onSelect={() => setSelectedPokemon(pokemon)
               }
             />
           ))}

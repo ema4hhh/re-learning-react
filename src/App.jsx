@@ -7,8 +7,7 @@ import PokemonInfo from './components/PokemonInfo';
 import PokemonFilter from './components/PokemonFilter';
 import PokemonTable from './components/PokemonTable';
 
-import { useDispatch, useSelector } from 'react-redux';
-import { setPokemon } from './pokemonSlice'
+import useStore from './store';
 
 const Title = styled.h1`
   text-align: center;
@@ -27,16 +26,9 @@ const Container = styled.div`
 
 
 function App() {
-  const pokemonData = useSelector(state => state.pokemon.pokemonData)
-  const dispatch = useDispatch();
-  
-  useEffect(() => {
-    fetch('http://127.0.0.1:5173/pokemon.json')
-      .then(response => response.json())
-      .then(data => dispatch(setPokemon(data)));
-  }, []);
+  const pokemon = useStore(state => state.pokemon);
 
-  if (!pokemonData) {
+  if (!pokemon) {
     return <div>Loading data</div>;
   }
 
